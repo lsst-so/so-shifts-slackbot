@@ -65,14 +65,17 @@ to `@os-night-shift`.
 
 ### OS Day Shift (`@os-day-shift`)
 
-Both rows 10 and 11 contribute members to the `@os-day-shift` Slack user group.
+Rows 10, 11, and 12 contribute members to the `@os-day-shift` Slack user group.
 
 | Row | Role | Cell content |
 | --- | --- | --- |
 | 10 | OS Day Shift Manager | Initials of the assigned OS, or `-` |
-| 11 | OS Day Shift | Initials of the assigned OS, or `-` |
+| 11 | OS Day Shift | Initials of the on-site OS, or `-` |
+| 12 | OS Day Shift (Remote) | Initials of a remote OS covering when row 11 is empty, or `-` |
 
-The **combined** set of non-empty assignees from rows 10 and 11 is synced to `@os-day-shift`.
+The **combined** set of non-empty assignees from rows 10–12 is synced to `@os-day-shift`.
+Row 12 is used as a **fallback**: when an on-site OS is unavailable, row 11 is left empty
+and a remote OS is entered in row 12 instead. The bot handles both cases automatically.
 
 ### Summit Support Scientist (`@summit-sup-sci`)
 
