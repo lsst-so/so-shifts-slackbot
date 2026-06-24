@@ -47,36 +47,13 @@ Slack bot scopes required: `usergroups:read`, `usergroups:write`, `users:read`, 
 
 ## Next step — /refresh-shift-tags slash command via Slack Workflow Builder
 
-**Goal:** Allow users to type `/refresh-shift-tags` in `#rso-shift-bot` to trigger an
-on-demand sync, without needing a persistent server.
+Full setup instructions in **[docs/workflow-builder-setup.md](docs/workflow-builder-setup.md)**.
 
-**Chosen approach:** Slack Workflow Builder (no server required).
-
-The workflow will:
-1. Be triggered by the `/refresh-shift-tags` slash command (configured inside Workflow Builder — not the Slack app)
-2. Post a "Refreshing..." message to the channel
-3. Send an HTTP POST to the GitHub API to trigger `workflow_dispatch` on `daily-sync.yml`
-4. The GitHub Actions job runs the sync and posts the result to `SLACK_STATUS_CHANNEL`
-
-**GitHub API call needed:**
-```
-POST https://api.github.com/repos/{owner}/{repo}/actions/workflows/daily-sync.yml/dispatches
-Authorization: Bearer {github_personal_access_token}
-Content-Type: application/json
-Body: {"ref": "main"}
-```
-
-The GitHub PAT needs the `actions:write` scope (or `repo` scope).
-Store it as a variable in the Slack workflow — do not hardcode it.
-
-**Steps to complete:**
-1. Create a GitHub Personal Access Token with `actions:write` scope.
-2. In Slack → Tools → Workflow Builder → Create Workflow:
-   - Trigger: Slash command → `/refresh-shift-tags`
-   - Step 1: Send a message → "Refreshing shift tags, please wait…"
-   - Step 2: Send a web request → POST to the GitHub API (details above)
-3. Publish the workflow.
-4. Test in `#rso-shift-bot`.
+Short version:
+1. Create a GitHub fine-grained PAT with **Actions: Read and write** on this repo.
+2. In Slack → Tools → Workflow Builder, create a workflow triggered by `/refresh-shift-tags`
+   that posts a confirmation message then POSTs to the GitHub `workflow_dispatch` API.
+3. Publish and test in `#rso-shift-bot`.
 
 ## Known issues / open items
 
@@ -105,5 +82,8 @@ so_shifts_slackbot/
     └── slack.py    # slack_sdk adapter: list_users_from_groups (pool-scoped), sync,
                     #   post_result (summary + thread)
 docs/
+├── setup.md                # start-to-finish local + Slack bot setup
+├── github-actions.md       # daily cron workflow setup
+├── workflow-builder-setup.md # /refresh-shift-tags slash command via Slack Workflow Builder
 └── summary-tab-layout.md   # authoritative layout reference for the Summary tab
 ```
