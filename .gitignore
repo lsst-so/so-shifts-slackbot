@@ -1,21 +1,25 @@
-.sconsign.dblite
-config.log
-.sconf_temp
-*.o
-*.os
-*.so
-*.cfgc
-*.pyc
-*_wrap.cc
-*Lib.py
+# --- Secrets & identifiers (NEVER commit) ---------------------------------
+.env
+*.env
+client_secret*.json
+credentials.json
+token.json
+authorized_user.json
+*.token
 
-# Built by sconsUtils
-version.py
-bin/
+# --- uv / virtualenv ------------------------------------------------------
+.venv/
 
-# Pytest
-tests/.tests
-pytest_session.txt
-.cache/
-.pytest_cache
-.coverage
+# --- Python ---------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+build/
+dist/
+
+# --- OS / editor ----------------------------------------------------------
+.DS_Store
+.idea/
+.vscode/

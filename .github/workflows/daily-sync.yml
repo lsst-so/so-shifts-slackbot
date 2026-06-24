@@ -1,0 +1,32 @@
+name: Daily Shift Sync
+
+on:
+  schedule:
+    - cron: '0 12 * * *'  # 12:00 UTC — ~08:00 Chile time (see docs/github-actions.md)
+  workflow_dispatch:        # manual trigger from the Actions tab
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Install dependencies
+        run: uv sync
+
+      - name: Write Google OAuth token
+        run: |
+          mkdir -p ~/.config/gspread
+          echo '${{ secrets.GSPREAD_TOKEN_JSON }}' > ~/.config/gspread/authorized_user.json
+
+      - name: Run shifts sync
+        env:
+          SHIFT_SHEET_ID: ${{ secrets.SHIFT_SHEET_ID }}
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          SLACK_STATUS_CHANNEL: ${{ vars.SLACK_STATUS_CHANNEL }}
+        run: uv run shifts-slackbot
