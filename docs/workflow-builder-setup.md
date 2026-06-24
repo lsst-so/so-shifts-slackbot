@@ -37,13 +37,12 @@ The workflow needs a token to call the GitHub API and dispatch the Actions workf
 2. Click **New Workflow**.
 3. **Name:** `Refresh Shift Tags`
 
-### Trigger: slash command
+### Trigger: link
 
-1. Choose **From a slash command** as the trigger.
-2. **Command name:** `/refresh-shift-tags`
-3. **Description:** Triggers an on-demand shift tag sync (updates `@summit-sup-sci`, `@os-day-shift`, `@os-night-shift`).
-4. **Channels:** Add `#rso-shift-bot` (and any other channel where the command should work).
-5. Save the trigger.
+1. Choose **From a link in Slack** as the trigger.
+2. **Workflow name:** `Refresh Shift Tags` (this becomes the link label).
+3. Save the trigger — Slack generates a `https://slack.com/shortcuts/…` link.
+4. Post that link in `#rso-shift-bot` (pin it so it's easy to find). Anyone who clicks it runs the workflow.
 
 ### Step 1 — Confirmation message
 

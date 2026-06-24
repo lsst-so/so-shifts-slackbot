@@ -51,8 +51,9 @@ Full setup instructions in **[docs/workflow-builder-setup.md](docs/workflow-buil
 
 Short version:
 1. Create a GitHub fine-grained PAT with **Actions: Read and write** on this repo.
-2. In Slack → Tools → Workflow Builder, create a workflow triggered by `/refresh-shift-tags`
+2. In Slack → Tools → Workflow Builder, create a workflow triggered by a link
    that posts a confirmation message then POSTs to the GitHub `workflow_dispatch` API.
+   Pin the generated link in `#rso-shift-bot`.
 3. Publish and test in `#rso-shift-bot`.
 
 ## Known issues / open items
