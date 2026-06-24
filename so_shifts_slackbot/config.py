@@ -23,6 +23,7 @@ class SummaryLayout:
         8:  ("OS Late Shift",            "os-night-shift"),
         9:  ("OS Day Shift Manager",     "os-day-shift"),
         10: ("OS Day Shift",             "os-day-shift"),
+        11: ("OS Day Shift (Remote)",    "os-day-shift"),
         15: ("Summit Support Scientist", "summit-sup-sci"),
     })
 

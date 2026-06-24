@@ -141,6 +141,7 @@ def _layout() -> SummaryLayout:
             8:  ("OS Late Shift",            "os-night-shift"),
             9:  ("OS Day Shift Manager",     "os-day-shift"),
             10: ("OS Day Shift",             "os-day-shift"),
+            11: ("OS Day Shift (Remote)",    "os-day-shift"),
             15: ("Summit Support Scientist", "summit-sup-sci"),
         },
     )
@@ -219,6 +220,20 @@ def test_parse_summary_wrong_date_returns_empty():
     )
     assert assignments == []
     assert warnings == []
+
+
+def test_parse_summary_remote_day_os_fallback():
+    """Row 11 (OS Day Shift Remote, 0-indexed) contributes to os-day-shift when row 10 is empty."""
+    target = date(2026, 6, 23)
+    summary = _build_summary(target, {9: "CR", 11: "BJ", 15: "MK"})
+    assignments, warnings = parse_summary_grid(summary, _OS_ROSTER, _SS_ROSTER, target, _layout())
+
+    assert not warnings
+    day_shift = [a for a in assignments if a.group_handle == "os-day-shift"]
+    roles = {a.role for a in day_shift}
+    assert "OS Day Shift Manager" in roles
+    assert "OS Day Shift (Remote)" in roles
+    assert "OS Day Shift" not in roles  # row 10 was empty
 
 
 def test_parse_summary_supsci_uses_supsci_roster():
