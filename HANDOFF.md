@@ -49,11 +49,11 @@ Slack bot scopes required: `usergroups:read`, `usergroups:write`, `users:read`, 
 
 Full setup instructions in **[docs/workflow-builder-setup.md](docs/workflow-builder-setup.md)**.
 
-Short version:
-1. Create a GitHub fine-grained PAT with **Actions: Read and write** on this repo.
-2. In Slack → Tools → Workflow Builder, create a workflow triggered by a link
-   that posts a confirmation message then POSTs to the GitHub `workflow_dispatch` API.
-   Pin the generated link in `#rso-shift-bot`.
+Short version (no PAT required — uses `GITHUB_TOKEN`):
+1. In Slack → Tools → Workflow Builder, create a workflow triggered by a link:
+   post a confirmation message, then **GitHub → Create an issue** titled `refresh-shift-tags`
+   in this repo. The Actions workflow detects the issue, syncs, and closes it automatically.
+2. Pin the generated Slack shortcut link in `#rso-shift-bot`.
 3. Publish and test in `#rso-shift-bot`.
 
 ## Known issues / open items

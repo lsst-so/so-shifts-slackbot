@@ -4,9 +4,13 @@ on:
   schedule:
     - cron: '0 12 * * *'  # 12:00 UTC — ~08:00 Chile time (see docs/github-actions.md)
   workflow_dispatch:        # manual trigger from the Actions tab
+  issues:
+    types: [opened]         # Slack Workflow Builder trigger (see docs/workflow-builder-setup.md)
 
 jobs:
   sync:
+    # For issue-triggered runs: only fire on the sentinel issue title.
+    if: github.event_name != 'issues' || contains(github.event.issue.title, 'refresh-shift-tags')
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
@@ -30,3 +34,9 @@ jobs:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
           SLACK_STATUS_CHANNEL: ${{ vars.SLACK_STATUS_CHANNEL }}
         run: uv run shifts-slackbot
+
+      - name: Close trigger issue
+        if: github.event_name == 'issues'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh issue close ${{ github.event.issue.number }} --comment "Sync complete."

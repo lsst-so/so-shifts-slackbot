@@ -1,37 +1,39 @@
-# Slack Workflow Builder — /refresh-shift-tags
+# Slack Workflow Builder — on-demand shift sync
 
-Sets up a Slack slash command that triggers an on-demand sync without a persistent server.
-The workflow catches `/refresh-shift-tags` in Slack, posts a "please wait" message, then
-fires the GitHub Actions `daily-sync.yml` workflow via the GitHub API.
+Sets up a Slack link that triggers an on-demand sync without a persistent server or HTTP
+connector. Clicking the link creates a sentinel GitHub issue; the Actions workflow detects
+it, runs the sync, then closes the issue automatically.
 
-The GitHub Actions job runs the sync and posts the result to `SLACK_STATUS_CHANNEL` when
-it finishes (~1 minute later).
+No GitHub PAT required — the workflow uses its built-in `GITHUB_TOKEN`.
+
+---
+
+## How it works
+
+```
+User clicks Slack link
+  → Workflow Builder posts "Refreshing…" message
+  → Workflow Builder creates GitHub issue titled "refresh-shift-tags"
+    → daily-sync.yml fires (issues: opened trigger)
+      → sync runs
+      → issue closed automatically
+        → bot posts run summary to SLACK_STATUS_CHANNEL
+```
 
 ---
 
 ## Prerequisites
 
-- Admin or workflow-editor access to the Slack workspace.
+- Workflow Builder access in the Slack workspace.
+- The GitHub connector connected to the `lsst-so` org in your Slack workspace
+  (Workflow Builder → Add a step → GitHub → Connect).
 - The daily sync GitHub Actions workflow already set up (see [github-actions.md](github-actions.md)).
+  The `daily-sync.yml` file already contains the `issues` trigger — nothing extra to configure
+  on the GitHub side.
 
 ---
 
-## Step 1 — Create a GitHub Personal Access Token
-
-The workflow needs a token to call the GitHub API and dispatch the Actions workflow.
-
-1. Go to **GitHub → Settings → Developer settings → Personal access tokens → Fine-grained tokens**.
-2. Click **Generate new token**.
-3. Set:
-   - **Token name:** `so-shifts-slackbot workflow dispatch`
-   - **Expiration:** 1 year (rotate annually)
-   - **Repository access:** Only select repositories → `lsst-so/so-shifts-slackbot`
-   - **Permissions → Repository permissions → Actions:** Read and write
-4. Click **Generate token** and copy it immediately — you won't see it again.
-
----
-
-## Step 2 — Create the Slack workflow
+## Step 1 — Create the Slack workflow
 
 1. In Slack, go to **Tools → Workflow Builder** (or **More → Automations**).
 2. Click **New Workflow**.
@@ -40,61 +42,54 @@ The workflow needs a token to call the GitHub API and dispatch the Actions workf
 ### Trigger: link
 
 1. Choose **From a link in Slack** as the trigger.
-2. **Workflow name:** `Refresh Shift Tags` (this becomes the link label).
-3. Save the trigger — Slack generates a `https://slack.com/shortcuts/…` link.
-4. Post that link in `#rso-shift-bot` (pin it so it's easy to find). Anyone who clicks it runs the workflow.
+2. Save — Slack generates a `https://slack.com/shortcuts/…` link.
 
 ### Step 1 — Confirmation message
 
 1. Add step: **Send a message**.
-2. **Send to:** The channel where the command was used (`{{channel}}`).
+2. **Send to:** The channel where the link was clicked (`{{channel}}`).
 3. **Message:**
    > Refreshing shift tags… this takes about a minute. I'll post an update when it's done.
 
-### Step 2 — Trigger GitHub Actions
+### Step 2 — Create the trigger issue
 
-1. Add step: **Send a web request**.
-2. Fill in:
+1. Add step: **GitHub → Create an issue**.
+2. Configure:
 
 | Field | Value |
 |---|---|
-| **URL** | `https://api.github.com/repos/lsst-so/so-shifts-slackbot/actions/workflows/daily-sync.yml/dispatches` |
-| **Method** | `POST` |
-| **Request body** | `{"ref": "main"}` |
+| **Repository** | `lsst-so/so-shifts-slackbot` |
+| **Title** | `refresh-shift-tags` |
+| **Body** | *(optional)* `On-demand sync triggered from Slack.` |
 
-3. Add request headers:
-
-| Key | Value |
-|---|---|
-| `Authorization` | `Bearer <your PAT from step 1>` |
-| `Accept` | `application/vnd.github+json` |
-| `X-GitHub-Api-Version` | `2022-11-28` |
-| `Content-Type` | `application/json` |
-
-4. Save the step.
+3. Save the step.
 
 ### Publish
 
 Click **Publish** to make the workflow active.
 
+### Post the link
+
+Copy the generated `https://slack.com/shortcuts/…` link and post it (pinned) in `#rso-shift-bot`.
+
 ---
 
-## Step 3 — Test
+## Step 2 — Test
 
-In `#rso-shift-bot`, type `/refresh-shift-tags`:
+Click the pinned link in `#rso-shift-bot`:
 
-- The "Refreshing…" message should appear immediately.
+- The "Refreshing…" message appears immediately.
+- A `refresh-shift-tags` issue opens in the repository, then closes automatically once the sync finishes.
 - After ~1 minute, the bot posts a run summary to `SLACK_STATUS_CHANNEL`.
-- Confirm the run triggered in the [Actions tab](https://github.com/lsst-so/so-shifts-slackbot/actions).
+- Check the [Actions tab](https://github.com/lsst-so/so-shifts-slackbot/actions) to confirm the run.
 
 ---
 
 ## Notes
 
-- The GitHub API returns HTTP 204 (No Content) on success — the dispatch is asynchronous,
-  so there is no immediate result payload. The Workflow Builder step succeeds as long as it
-  gets a 2xx response.
-- The PAT is visible to workspace admins in the Workflow Builder config. Rotate it annually
-  or immediately if it is ever exposed.
-- If the sync fails, GitHub sends an email to the repo owner (standard Actions failure alert)
-  and the Slack run summary will include error details.
+- Any issue opened in the repo with a title that does **not** contain `refresh-shift-tags` is
+  ignored by the workflow — normal issue tracker use is unaffected.
+- The issue list will stay clean: every trigger issue is closed automatically with a
+  "Sync complete." comment.
+- The `GITHUB_TOKEN` used to close the issue is scoped to the repository and expires when the
+  workflow run ends — no long-lived secrets required.
