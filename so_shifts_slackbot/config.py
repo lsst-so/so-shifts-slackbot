@@ -6,6 +6,7 @@ Load with ``Settings.from_env()`` at startup.
 
 from __future__ import annotations
 
+import json
 import os
 from dataclasses import dataclass, field
 
@@ -62,6 +63,12 @@ class Settings:
     # Leave empty to skip posting.
     slack_status_channel: str = ""
 
+    # Map sheet roster names → Slack display/real names when they differ.
+    # Keys and values are compared case-insensitively. Load from NAME_ALIASES
+    # env var as JSON, e.g. '{"Sheet Name": "Slack Name"}'.
+    # Never hard-code names here — keep them in .env (gitignored).
+    name_aliases: dict[str, str] = field(default_factory=dict)
+
     # OS roster: names A12:A, initials B12:B → start_row=11 (0-based)
     os_roster_layout: RosterLayout = field(default_factory=lambda: RosterLayout(start_row=11))
 
@@ -80,6 +87,10 @@ class Settings:
         }
         s.slack_group_overrides = {k: v for k, v in overrides.items() if v}
         s.slack_status_channel = os.environ.get("SLACK_STATUS_CHANNEL", "")
+        raw_aliases = os.environ.get("NAME_ALIASES", "")
+        if raw_aliases:
+            parsed = json.loads(raw_aliases)
+            s.name_aliases = {k.lower(): v.lower() for k, v in parsed.items()}
         return s
 
     def validate(self) -> None:

@@ -102,11 +102,19 @@ def list_users_from_groups(
 def resolve_names(
     names: tuple[str, ...],
     user_map: dict[str, str],
+    aliases: dict[str, str] | None = None,
 ) -> tuple[list[str], list[str]]:
-    """Match full names to Slack user IDs. Returns (matched_ids, unmatched_names)."""
+    """Match full names to Slack user IDs. Returns (matched_ids, unmatched_names).
+
+    ``aliases`` maps lowercase sheet names to lowercase Slack names for cases
+    where the roster name differs from the Slack display/real name.
+    """
     matched, unmatched = [], []
     for name in names:
-        uid = user_map.get(name.lower())
+        key = name.lower()
+        if aliases:
+            key = aliases.get(key, key)
+        uid = user_map.get(key)
         if uid:
             matched.append(uid)
         else:
@@ -118,6 +126,7 @@ def build_updates(
     assignments: list[ShiftAssignment],
     group_map: dict[str, str],
     user_map: dict[str, str],
+    aliases: dict[str, str] | None = None,
 ) -> tuple[list[GroupUpdate], list[str]]:
     """Aggregate assignments by group handle and resolve names to Slack IDs.
 
@@ -136,7 +145,7 @@ def build_updates(
         if not group_id:
             warnings.append(f"Slack group @{handle} not found in workspace")
             continue
-        member_ids, unmatched = resolve_names(tuple(names), user_map)
+        member_ids, unmatched = resolve_names(tuple(names), user_map, aliases)
         if unmatched:
             warnings.append(f"@{handle}: could not resolve Slack user(s): {', '.join(unmatched)}")
         if not member_ids:
@@ -250,7 +259,7 @@ def sync(
             for a in assignments
         ]
 
-    updates, warnings = build_updates(assignments, group_map, user_map)
+    updates, warnings = build_updates(assignments, group_map, user_map, settings.name_aliases or None)
     result.skipped.extend(warnings)
 
     errors = apply_updates(client, updates, dry_run=dry_run)
