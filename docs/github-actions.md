@@ -52,6 +52,13 @@ Add these secrets:
 | `SHIFT_SHEET_ID` | The Google Sheets spreadsheet id |
 | `SLACK_BOT_TOKEN` | The Slack bot token (`xoxb-…`) |
 | `GSPREAD_TOKEN_JSON` | The full contents of `authorized_user.json` (from step 1) |
+| `NAME_ALIASES` | JSON map of sheet names → Slack names (see below; omit if not needed) |
+
+`NAME_ALIASES` is only required when a person's name in the spreadsheet roster
+differs from their Slack display/real name. Format: a JSON object where each key
+is the name as it appears in the sheet and each value is the name as it appears
+in Slack. Example: `{"Sheet Full Name": "Slack Display Name"}`.
+Keep this as a **secret** (not a variable) because it contains personal names.
 
 Optional — add as a **variable** (not a secret, value is visible):
 
