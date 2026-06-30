@@ -64,14 +64,14 @@ Optional — add as a **variable** (not a secret, value is visible):
 ## Step 3 — The workflow file
 
 The workflow lives at `.github/workflows/daily-sync.yml` in the repository. It runs at
-**12:00 UTC** (≈ 08:00 Chile Standard Time / 09:00 Chile Summer Time).
+**10:00 UTC** (≈ 06:00 Chile Standard Time / 07:00 Chile Summer Time).
 
 ```yaml
 name: Daily Shift Sync
 
 on:
   schedule:
-    - cron: '0 12 * * *'   # 12:00 UTC — ~08:00 Chile time
+    - cron: '0 10 * * *'   # 10:00 UTC — ~06:00 Chile time
   workflow_dispatch:         # manual trigger from the Actions tab
 ```
 
@@ -110,7 +110,7 @@ update the `GSPREAD_TOKEN_JSON` secret with the new token contents.
 
 | UTC time | Chile Standard Time (UTC-4) | Chile Summer Time (UTC-3) |
 |---|---|---|
-| 12:00 | 08:00 | 09:00 |
+| 10:00 | 06:00 | 07:00 |
 
 Chile uses Standard Time roughly May–September and Summer Time October–April.
 Adjust the cron expression in the workflow file if a different local time is preferred.

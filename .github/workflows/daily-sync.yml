@@ -2,7 +2,7 @@ name: Daily Shift Sync
 
 on:
   schedule:
-    - cron: '0 12 * * *'  # 12:00 UTC — ~08:00 Chile time (see docs/github-actions.md)
+    - cron: '0 10 * * *'  # 10:00 UTC — ~06:00 Chile time (see docs/github-actions.md)
   workflow_dispatch:        # manual trigger from the Actions tab
 
 jobs:
