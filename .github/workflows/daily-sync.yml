@@ -30,4 +30,7 @@ jobs:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
           SLACK_STATUS_CHANNEL: ${{ vars.SLACK_STATUS_CHANNEL }}
           NAME_ALIASES: ${{ secrets.NAME_ALIASES }}
+          SLACK_GROUP_SUPSCI: ${{ vars.SLACK_GROUP_SUPSCI }}
+          SLACK_GROUP_DAY: ${{ vars.SLACK_GROUP_DAY }}
+          SLACK_GROUP_NIGHT: ${{ vars.SLACK_GROUP_NIGHT }}
         run: uv run shifts-slackbot
