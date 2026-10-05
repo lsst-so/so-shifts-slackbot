@@ -113,12 +113,12 @@ Used for: rows 8, 9, 10, 11 in the Summary tab.
 
 | Column | Content | Starting row |
 | --- | --- | --- |
-| A | Full name | Row 6 |
-| B | Initials | Row 6 |
+| A | Full name | Row 7 |
+| B | Initials | Row 7 |
 
 Each person occupies **two rows merged vertically** in column A (availability row + shift
 row, same as the rest of the SupSci tab). The name appears only in the top cell of each
-merged pair. Read pairs downward (rows 6, 8, 10, …) until the first blank name cell.
+merged pair. Read pairs downward (rows 7, 9, 11, …) until the first blank name cell.
 
 **Name format:** SupSci names are stored as `"Name Surname"` (e.g. `"<name>"`) —
 no reordering needed.

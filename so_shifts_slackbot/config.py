@@ -72,8 +72,8 @@ class Settings:
     # OS roster: names A12:A, initials B12:B → start_row=11 (0-based)
     os_roster_layout: RosterLayout = field(default_factory=lambda: RosterLayout(start_row=11))
 
-    # SupSci roster: names A6:A, initials B6:B → start_row=5 (0-based)
-    supsci_roster_layout: RosterLayout = field(default_factory=lambda: RosterLayout(start_row=5))
+    # SupSci roster: names A7:A, initials B7:B → start_row=6 (0-based)
+    supsci_roster_layout: RosterLayout = field(default_factory=lambda: RosterLayout(start_row=6))
 
     @classmethod
     def from_env(cls) -> Settings:
